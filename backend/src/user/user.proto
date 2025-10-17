@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package user;
+
+// Single user message
+message User {
+  string id = 1;
+  string email = 2;
+  string emailHash = 3;
+  bytes signature = 4; // binary data
+  string role = 5;
+  string status = 6;
+  string createdAt = 7; // timestamp type
+}
+
+// Wrapper for multiple users
+message Users {
+  repeated User users = 1; // array of User objects
+}
