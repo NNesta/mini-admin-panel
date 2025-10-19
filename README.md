@@ -10,21 +10,6 @@ Implements **user management (CRUD)**, **Protobuf serialization**, and **RSA + S
 **Backend:** NestJS, TypeORM, SQLite3, Swagger, protobufjs, Crypto (RSA + SHA-384), TypeScript  
 **Frontend:** Next.js 15, TailwindCSS, shadcn UI, Sonner, Recharts, React Hook Form, Zod, TypeScript
 
----
-
-## 🏗️ Project Structure
-
-```
-.
-├── backend/    # NestJS backend
-│   ├── keys/   # RSA keypair (⚠️ testing only)
-│   ├── .env    # environment variables
-│   └── proto/  # user.proto schema
-└── frontend/   # Next.js frontend
-```
-
----
-
 ## 🚀 Setup & Run
 
 ### Backend
@@ -74,17 +59,6 @@ npm run dev
 ## 🧠 Notes & Assumptions
 
 - Backend and frontend run separately (`4000`, `3000`).
-- Keys and environment files must be kept private.
+- I added the keys folder and .env file for testing purposes only. It should be in .gitignore in real life project
 - Protobuf schema ensures consistent data exchange.
 - Swagger is used for backend API documentation.
-
----
-
-## 🧩 Author
-
-**Nestor Ngabonziza**  
-Full-Stack Developer — MERN / PERN / NestJS / React Native
-
----
-
-> ✅ Includes secure signing, Protobuf serialization, and responsive UI — all in a clean NestJS + Next.js monorepo.
