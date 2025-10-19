@@ -1,4 +1,9 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import {
+  Injectable,
+  OnModuleInit,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
@@ -10,7 +15,6 @@ import * as protobuf from 'protobufjs';
 @Injectable()
 export class UsersService implements OnModuleInit {
   private privateKey: string;
-  private publicKey: string;
   private protoRoot: protobuf.Root;
 
   constructor(
@@ -23,27 +27,18 @@ export class UsersService implements OnModuleInit {
     const protoPath = path.join(__dirname, 'user.proto');
     this.protoRoot = await protobuf.load(protoPath);
   }
-  private ensureKeys() {
-    const keyDir = path.join(__dirname, '../../keys');
-    const privPath = path.join(keyDir, 'private.pem');
-    const pubPath = path.join(keyDir, 'public.pem');
-
-    if (!fs.existsSync(keyDir)) fs.mkdirSync(keyDir);
-
-    if (!fs.existsSync(privPath) || !fs.existsSync(pubPath)) {
-      const { privateKey, publicKey } = crypto.generateKeyPairSync('rsa', {
-        modulusLength: 2048,
-        publicKeyEncoding: { type: 'pkcs1', format: 'pem' },
-        privateKeyEncoding: { type: 'pkcs1', format: 'pem' },
-      });
-      fs.writeFileSync(privPath, privateKey);
-      fs.writeFileSync(pubPath, publicKey);
-    }
-
-    this.privateKey = fs.readFileSync(privPath, 'utf-8');
-    this.publicKey = fs.readFileSync(pubPath, 'utf-8');
+  private async ensureKeys() {
+    const privateKeyPath = path.join(process.cwd(), 'keys/private.pem');
+    this.privateKey = fs.readFileSync(privateKeyPath, 'utf8');
   }
+
   async createUser(data: Partial<User>) {
+    const existingUser = await this.userRepo.findOne({
+      where: { email: data.email },
+    });
+    if (existingUser) {
+      throw new HttpException('User already exists', HttpStatus.BAD_REQUEST);
+    }
     const hash = crypto.createHash('sha384').update(data.email).digest('hex');
     const signature = crypto.sign(
       'sha384',
@@ -97,14 +92,9 @@ export class UsersService implements OnModuleInit {
         signature: Buffer.from(u.signature, 'base64'),
       })),
     };
-    console.log(payload);
     const err = UsersMsg.verify(payload);
     if (err) throw new Error(err);
     const buffer = UsersMsg.encode(UsersMsg.create(payload)).finish();
     return Buffer.from(buffer);
-  }
-
-  getPublicKey() {
-    return this.publicKey;
   }
 }
