@@ -75,6 +75,15 @@ export class UsersService implements OnModuleInit {
     if (!user) return null;
     Object.assign(user, data);
     if (data.email) {
+      const emailExists = await this.userRepo.findOne({
+        where: { email: data.email },
+      });
+      if (emailExists) {
+        throw new HttpException(
+          'User with such email already exists',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
       const hash = crypto.createHash('sha384').update(data.email).digest('hex');
       const signature = crypto.sign(
         'sha384',
