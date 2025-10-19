@@ -18,7 +18,7 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           status: response.status,
-          message: data?.message || "Unknown error from backend",
+          message: data?.message || "Failed to create user",
         },
         { status: response.status }
       );
@@ -80,15 +80,22 @@ export async function PUT(request: Request) {
       },
       body: JSON.stringify(data),
     });
-    return NextResponse.json({
-      status: response.status,
-      success: true,
-      message: "User updated successfully",
-    });
+    const formData = await response.json().catch(() => null);
+
+    if (!response.ok) {
+      return NextResponse.json(
+        {
+          status: response.status,
+          message: formData?.message || "Failed to update user",
+        },
+        { status: response.status }
+      );
+    }
+    return NextResponse.json(formData);
   } catch (error) {
-    console.error(error);
+    console.error("Next.js POST /users error:", error);
     return NextResponse.json(
-      { error: "Internal Server Error" },
+      { message: "Failed to update user", error: (error as Error).message },
       { status: 500 }
     );
   }

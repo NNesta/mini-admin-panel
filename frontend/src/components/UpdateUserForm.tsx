@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Label } from "./ui/label";
@@ -14,8 +14,15 @@ import {
   DialogTitle,
 } from "./ui/dialog";
 import { Button } from "./ui/button";
-import { User } from "@/lib/types";
+import { ErrorResponse, User } from "@/lib/types";
 import { toast } from "sonner";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
 
 const formSchema = z.object({
   email: z.string().email("Invalid email format"),
@@ -33,6 +40,7 @@ const UpdateUserForm = ({
   setEditUser: (user: User | null) => void;
 }) => {
   const {
+    control,
     register,
     handleSubmit,
     formState: { errors },
@@ -44,7 +52,7 @@ const UpdateUserForm = ({
       status: editUser.status,
     },
   });
-  const onSubmit = async (data: FormData) => {
+  const onSubmit = async (formData: FormData) => {
     try {
       const response = await fetch(`/api/users`, {
         method: "PUT",
@@ -53,11 +61,13 @@ const UpdateUserForm = ({
         },
         body: JSON.stringify({
           id: editUser?.id,
-          ...data,
+          ...formData,
         }),
       });
+      const data: ErrorResponse & User = await response.json();
       if (!response.ok) {
-        toast.error("Failed to update user");
+        toast.error(data.message || "Failed to update user");
+        return;
       }
       toast.info("User updated", {
         description: `${data.email} has been updated successfully.`,
@@ -84,7 +94,12 @@ const UpdateUserForm = ({
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" {...register("email")} />
+              <Input
+                id="email"
+                type="email"
+                placeholder="user@example.com"
+                {...register("email")}
+              />
               {errors.email && (
                 <p className="text-red-500 text-sm">{errors.email.message}</p>
               )}
@@ -92,17 +107,46 @@ const UpdateUserForm = ({
 
             <div className="space-y-2">
               <Label htmlFor="role">Role</Label>
-              <Input id="role" {...register("role")} />
+              <Controller
+                name="role"
+                control={control}
+                render={({ field }) => (
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select role" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="user">User</SelectItem>
+                      <SelectItem value="admin">Admin</SelectItem>
+                      <SelectItem value="moderator">Moderator</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
               {errors.role && (
-                <p className="text-red-500 text-sm">{errors.role.message}</p>
+                <p className="text-sm text-red-500">{errors.role.message}</p>
               )}
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="status">Status</Label>
-              <Input id="status" {...register("status")} />
+              <Controller
+                name="status"
+                control={control}
+                render={({ field }) => (
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="active">Active</SelectItem>
+                      <SelectItem value="inactive">Inactive</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
               {errors.status && (
-                <p className="text-red-500 text-sm">{errors.status.message}</p>
+                <p className="text-sm text-red-500">{errors.status.message}</p>
               )}
             </div>
 

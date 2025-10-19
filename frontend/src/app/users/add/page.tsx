@@ -24,7 +24,6 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 
-// ✅ Define schema for validation (optional but recommended)
 const formSchema = z.object({
   email: z.string().email("Enter a valid email"),
   role: z.string().min(1, "Select a role"),
@@ -34,7 +33,6 @@ const formSchema = z.object({
 type FormData = z.infer<typeof formSchema>;
 
 export default function AddUser() {
-  // ✅ Setup React Hook Form
   const {
     control,
     handleSubmit,
@@ -84,7 +82,6 @@ export default function AddUser() {
 
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            {/* Email */}
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -98,7 +95,6 @@ export default function AddUser() {
               )}
             </div>
 
-            {/* Role */}
             <div className="space-y-2">
               <Label htmlFor="role">Role</Label>
               <Controller
@@ -122,7 +118,6 @@ export default function AddUser() {
               )}
             </div>
 
-            {/* Status */}
             <div className="space-y-2">
               <Label htmlFor="status">Status</Label>
               <Controller
@@ -145,7 +140,6 @@ export default function AddUser() {
               )}
             </div>
 
-            {/* Actions */}
             <div className="flex gap-2 pt-4">
               <Button type="submit">Create User</Button>
               <Button type="button" variant="outline" onClick={() => reset()}>
