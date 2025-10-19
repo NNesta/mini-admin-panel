@@ -1,5 +1,5 @@
 import UsersTable from "@/components/UsersTable";
-import { decodeBufferResponse } from "@/lib/rsahelper";
+import { decodeBufferResponse, verifySHA384withRSA } from "@/lib/rsahelper";
 import React from "react";
 
 const UsersPage = async () => {
@@ -8,7 +8,20 @@ const UsersPage = async () => {
     throw new Error("Failed to fetch users");
   }
   const users = await decodeBufferResponse(response);
-  return <UsersTable usersList={users} />;
+  const usersWithVerification = users.map((user) => {
+    const isSignatureValid = verifySHA384withRSA(
+      user.emailHash,
+      user.signature
+    );
+    return {
+      ...user,
+      isSignatureValid,
+    };
+  });
+  const validUsers = usersWithVerification.filter(
+    (user) => user.isSignatureValid
+  );
+  return <UsersTable usersList={validUsers} />;
 };
 
 export default UsersPage;
