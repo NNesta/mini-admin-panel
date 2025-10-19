@@ -31,32 +31,33 @@ npm run dev
 
 ## Notes & Assumptions
 
-- The **backend** and **frontend** applications run independently on different ports:
+1. The **backend** and **frontend** applications run independently on different ports:
 
-  - **Backend:** `http://localhost:4000`
-  - **Frontend:** `http://localhost:3000`
+- **Backend:** `http://localhost:4000`
+- **Frontend:** `http://localhost:3000`
 
-- To **generate RSA + SHA-384 keys**, run the following command from the **backend** directory:
+2. To **generate RSA + SHA-384 keys**, run the following command from the **backend** directory:
 
-  ```bash
-  npm run generate:keys
-  ```
+```bash
+npm run generate:keys
+```
 
-  This script will automatically create a `keys` folder within the **frontend** and **backend** directories and place the corresponding public key there.
+This script will automatically create a `keys` folder within the **frontend** and **backend** directories and place the corresponding public and private keys there.
 
-- For testing purposes, a sample set of users is preloaded in the **SQLite** database.  
-  Please note that these users were created using a specific key pair.  
-  To validate their signatures correctly, use the provided example keys:
+3. For testing purposes, a sample set of users is preloaded in the **SQLite** database.  
+   Please note that these users were created using a specific key pair.  
+   To validate their signatures correctly, use the provided example keys:
 
-  - **Public key:** `frontend/keys.example` → copy to `frontend/keys/public.pem`
-  - **Private key:** `backend/keys.example` → copy to `backend/keys/private.pem`
+- **Public key:** `frontend/keys.example` → copy to `frontend/keys/public.pem`
+- **Private key:** `backend/keys.example` → copy to `backend/keys/private.pem`
 
-- Before running either service, ensure that you copy environment variables from `.env.example` to `.env` in both the **frontend** and **backend** directories.
+4. Before running either service, ensure that you copy environment variables from `.env.example` to `.env` in both the **frontend** and **backend** directories.
 
-- **Swagger UI** is integrated for backend API documentation and can be accessed at:
-  ```
-  http://localhost:4000/api-docs
-  ```
+5. **Swagger UI** is integrated for backend API documentation and can be accessed at:
+
+```
+http://localhost:4000/api-docs
+```
 
 ## ⚙️ Tech Stack
 
