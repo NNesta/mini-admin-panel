@@ -1,28 +1,36 @@
-export const importPrivateKey = (pem: string) => {
-  // Remove PEM header/footer and whitespace
-  const binaryDer = str2ab(window.atob(cleanPrivateKey(pem)));
+import { existsSync, mkdirSync, writeFileSync } from 'fs';
+import { resolve, join } from 'path';
+import { generateKeyPairSync } from 'crypto';
 
-  return crypto.subtle.importKey(
-    'spki',
-    binaryDer,
-    {
-      name: 'RSASSA-PKCS1-v1_5',
-      hash: 'SHA-384',
-    },
-    false,
-    ['sign'],
-  );
-};
-function str2ab(str: string) {
-  const buf = new ArrayBuffer(str.length);
-  const view = new Uint8Array(buf);
-  for (let i = 0; i < str.length; i++) view[i] = str.charCodeAt(i);
-  return buf;
+export async function generateKeys() {
+  try {
+    console.log(resolve);
+    const backendDir = resolve(__dirname, '../../');
+    const frontendDir = resolve(backendDir, '../frontend');
+
+    const backendKeysDir = resolve(backendDir, 'keys');
+    const frontendKeysDir = resolve(frontendDir, 'keys');
+
+    // Create key folders if missing
+    [backendKeysDir, frontendKeysDir].forEach((dir) => {
+      if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
+    });
+
+    // Generate RSA key pair
+    const { privateKey, publicKey } = generateKeyPairSync('rsa', {
+      modulusLength: 2048,
+      publicKeyEncoding: { type: 'spki', format: 'pem' },
+      privateKeyEncoding: { type: 'pkcs8', format: 'pem' },
+    });
+
+    // Write keys to files
+    writeFileSync(join(backendKeysDir, 'private.pem'), privateKey);
+    writeFileSync(join(frontendKeysDir, 'public.pem'), publicKey);
+
+    console.log('✅ RSA key pair generated successfully!');
+    console.log(`🔒 Backend private key: ${backendKeysDir}/private.pem`);
+    console.log(`🔑 Frontend public key: ${frontendKeysDir}/public.pem`);
+  } catch (err) {
+    console.error('❌ Error generating keys:', err);
+  }
 }
-
-export const cleanPrivateKey = (pem: string) => {
-  return pem
-    .replace('-----BEGIN RSA PRIVATE KEY-----', '')
-    .replace('-----END RSA PRIVATE KEY-----', '')
-    .replace(/\s+/g, '');
-};

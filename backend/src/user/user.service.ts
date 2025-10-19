@@ -24,7 +24,15 @@ export class UsersService implements OnModuleInit {
 
   async onModuleInit() {
     this.ensureKeys();
-    const protoPath = path.join(__dirname, 'user.proto');
+    const protoPath = path.join(
+      __dirname,
+      '..',
+      '..',
+      '..',
+      'src',
+      'user',
+      'user.proto',
+    );
     this.protoRoot = await protobuf.load(protoPath);
   }
   private async ensureKeys() {
