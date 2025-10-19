@@ -1,27 +1,30 @@
-import UserChart from '../components/UserChart';
-import { fetchAndDecodeUsers } from '../lib/helper';
-import { User } from '../lib/types';
-
-// const fetchUsers = async (): Promise<User[]> => {
-//   const response = await fetch(
-//     `${process.env.NEXT_PUBLIC_API_URL}/users/export`
-//   );
-//   if (!response.ok) {
-//     throw new Error('Failed to fetch users');
-//   }
-//   const data = await response.json();
-//   console.log({ data });
-//   return data;
-// };
+import {
+  decodeBufferResponse,
+  // verifyEmailSignature,
+  verifySHA384withRSA,
+} from "@/lib/rsahelper";
+import UserChart from "../components/UserChart";
 
 const Index = async () => {
-  let users: User[] = [];
-  try {
-    users = await fetchAndDecodeUsers();
-    console.log({ users });
-  } catch (error) {
-    console.error(error);
+  const response = await fetch(`${process.env.API_URL}/users/export`);
+  if (!response.ok) {
+    throw new Error("Failed to fetch users");
   }
+  const users = await decodeBufferResponse(response);
+  const usersWithVerification = users.map((user) => {
+    const isSignatureValid = verifySHA384withRSA(
+      user.emailHash,
+      user.signature
+    );
+    return {
+      ...user,
+      isSignatureValid,
+    };
+  });
+
+  const validUsers = usersWithVerification.filter(
+    (user) => user.isSignatureValid
+  );
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto p-8">
@@ -33,15 +36,7 @@ const Index = async () => {
             Track your user growth and engagement
           </p>
         </header>
-        {/* <div className="space-y-6">
-            <div className="grid gap-4 md:grid-cols-3">
-              <Skeleton className="h-32 rounded-lg" />
-              <Skeleton className="h-32 rounded-lg" />
-              <Skeleton className="h-32 rounded-lg" />
-            </div>
-            <Skeleton className="h-[450px] rounded-lg" />
-          </div> */}
-        <UserChart users={users} />
+        <UserChart users={validUsers} />
       </div>
     </div>
   );

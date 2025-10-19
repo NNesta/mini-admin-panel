@@ -1,5 +1,5 @@
-'use client';
-import Link from 'next/link';
+"use client";
+import Link from "next/link";
 import {
   Sidebar,
   SidebarContent,
@@ -12,13 +12,13 @@ import {
   SidebarProvider,
   SidebarTrigger,
   useSidebar,
-} from './ui/sidebar';
-import { LayoutDashboard, Users, UserPlus } from 'lucide-react';
+} from "./ui/sidebar";
+import { LayoutDashboard, Users, UserPlus } from "lucide-react";
 
 const menuItems = [
-  { title: 'Dashboard', url: '/', icon: LayoutDashboard },
-  { title: 'All Users', url: '/users', icon: Users },
-  { title: 'Add User', url: '/users/add', icon: UserPlus },
+  { title: "Dashboard", url: "/", icon: LayoutDashboard },
+  { title: "All Users", url: "/users", icon: Users },
+  { title: "Add User", url: "/users/add", icon: UserPlus },
 ];
 
 function AppSidebar() {
@@ -68,8 +68,8 @@ export default function AdminLayout({
         <div className="flex-1 flex flex-col">
           <header className="h-14 border-b border-border bg-card flex items-center px-4">
             <SidebarTrigger />
-            <h1 className="ml-4 text-lg font-semibold bg-gradient-to-r from-primary to-[hsl(var(--primary-glow))] bg-clip-text text-transparent">
-              Admin Panel
+            <h1 className="ml-4 text-lg font-semibold text-foreground">
+              Admin Panels
             </h1>
           </header>
           <main className="flex-1 p-6 bg-background">{children}</main>

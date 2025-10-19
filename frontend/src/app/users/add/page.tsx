@@ -1,36 +1,77 @@
-'use client';
-import { useState } from 'react';
+"use client";
+
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { ErrorResponse, User } from "@/lib/types";
+
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/src/components/ui/card';
-import { Button } from '@/src/components/ui/button';
-import { Input } from '@/src/components/ui/input';
-import { Label } from '@/src/components/ui/label';
-import { toast } from 'sonner';
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/src/components/ui/select';
+} from "@/components/ui/select";
+import { toast } from "sonner";
+
+// ✅ Define schema for validation (optional but recommended)
+const formSchema = z.object({
+  email: z.string().email("Enter a valid email"),
+  role: z.string().min(1, "Select a role"),
+  status: z.string().min(1, "Select a status"),
+});
+
+type FormData = z.infer<typeof formSchema>;
 
 export default function AddUser() {
-  const [formData, setFormData] = useState({
-    email: '',
-    role: 'user',
-    status: 'active',
+  // ✅ Setup React Hook Form
+  const {
+    control,
+    handleSubmit,
+    register,
+    reset,
+    formState: { errors },
+  } = useForm<FormData>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      email: "",
+      role: "user",
+      status: "active",
+    },
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    toast.success('User created', {
-      description: `${formData.email} has been added successfully.`,
-    });
+  const onSubmit = async (formData: FormData) => {
+    try {
+      const response = await fetch(`/api/users`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+      const data: ErrorResponse & User = await response.json();
+      if (!response.ok) {
+        toast.error(data.message || "Failed to create user");
+        return;
+      }
+      toast.success("User created", {
+        description: `${data.email} has been added successfully.`,
+      });
+      reset();
+    } catch (error) {
+      console.error("Submit error:", error);
+      toast.error((error as Error).message || "Something went wrong");
+    }
   };
 
   return (
@@ -40,66 +81,74 @@ export default function AddUser() {
           <CardTitle>Add New User</CardTitle>
           <CardDescription>Create a new user account</CardDescription>
         </CardHeader>
+
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            {/* Email */}
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
                 type="email"
                 placeholder="user@example.com"
-                value={formData.email}
-                onChange={(e) =>
-                  setFormData({ ...formData, email: e.target.value })
-                }
-                required
+                {...register("email")}
               />
+              {errors.email && (
+                <p className="text-sm text-red-500">{errors.email.message}</p>
+              )}
             </div>
 
+            {/* Role */}
             <div className="space-y-2">
               <Label htmlFor="role">Role</Label>
-              <Select
-                value={formData.role}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, role: value })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select role" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="user">User</SelectItem>
-                  <SelectItem value="admin">Admin</SelectItem>
-                  <SelectItem value="moderator">Moderator</SelectItem>
-                </SelectContent>
-              </Select>
+              <Controller
+                name="role"
+                control={control}
+                render={({ field }) => (
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select role" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="user">User</SelectItem>
+                      <SelectItem value="admin">Admin</SelectItem>
+                      <SelectItem value="moderator">Moderator</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              {errors.role && (
+                <p className="text-sm text-red-500">{errors.role.message}</p>
+              )}
             </div>
 
+            {/* Status */}
             <div className="space-y-2">
               <Label htmlFor="status">Status</Label>
-              <Select
-                value={formData.status}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, status: value })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="inactive">Inactive</SelectItem>
-                </SelectContent>
-              </Select>
+              <Controller
+                name="status"
+                control={control}
+                render={({ field }) => (
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="active">Active</SelectItem>
+                      <SelectItem value="inactive">Inactive</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              {errors.status && (
+                <p className="text-sm text-red-500">{errors.status.message}</p>
+              )}
             </div>
 
+            {/* Actions */}
             <div className="flex gap-2 pt-4">
               <Button type="submit">Create User</Button>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => console.log('/users')}
-              >
+              <Button type="button" variant="outline" onClick={() => reset()}>
                 Cancel
               </Button>
             </div>

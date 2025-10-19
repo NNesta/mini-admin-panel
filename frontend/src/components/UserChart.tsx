@@ -1,9 +1,9 @@
-import { Users, TrendingUp } from 'lucide-react';
-import { Card } from './ui/card';
-import { Chart } from './Chart';
-import { getUserStats } from '../lib/helper';
-import { User } from '../lib/types';
-import UserStats from './UserStats';
+import { Users, TrendingUp } from "lucide-react";
+import { Card } from "./ui/card";
+import { Chart } from "./Chart";
+import { getUserStats } from "../lib/helper";
+import { User } from "../lib/types";
+import UserStats from "./UserStats";
 
 const UserChart = ({ users }: { users: User[] }) => {
   const {
@@ -13,7 +13,6 @@ const UserChart = ({ users }: { users: User[] }) => {
     yesterday: yesterdayUsers,
     trend,
   } = getUserStats(users);
-  console.log({ chartData });
   return (
     <div className="space-y-6">
       <div className="grid gap-4 md:grid-cols-3">
@@ -42,18 +41,18 @@ const UserChart = ({ users }: { users: User[] }) => {
                 Growth
               </p>
               <h3 className="mt-2 text-3xl font-bold text-foreground">
-                {Number(trend) >= 0 ? '+' : ''}
+                {Number(trend) >= 0 ? "+" : ""}
                 {trend}%
               </h3>
             </div>
             <div
               className={`rounded-full p-3 ${
-                Number(trend) >= 0 ? 'bg-green-500/10' : 'bg-red-500/10'
+                Number(trend) >= 0 ? "bg-green-500/10" : "bg-red-500/10"
               }`}
             >
               <TrendingUp
                 className={`h-6 w-6 ${
-                  Number(trend) >= 0 ? 'text-green-500' : 'text-red-500'
+                  Number(trend) >= 0 ? "text-green-500" : "text-red-500"
                 }`}
               />
             </div>
