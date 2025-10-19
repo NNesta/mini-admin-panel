@@ -29,9 +29,6 @@ npm run dev
 
 - UI: **http://localhost:3000**
 
-> ⚠️ **Note:** The `keys/` folder and `.env` file are committed only for testing.  
-> In production, add them to `.gitignore` and never push them to the repository.
-
 ## Notes & Assumptions
 
 - The **backend** and **frontend** applications run independently on different ports:
