@@ -33,31 +33,6 @@ const UserChart = ({ users }: { users: User[] }) => {
         </Card>
         <UserStats label="Today" value={todayUsers} />
         <UserStats label="Yesterday" value={yesterdayUsers} />
-
-        <Card className="p-6 bg-card border-border transition-all duration-300 hover:shadow-[var(--shadow-card)]">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">
-                Growth
-              </p>
-              <h3 className="mt-2 text-3xl font-bold text-foreground">
-                {Number(trend) >= 0 ? "+" : ""}
-                {trend}%
-              </h3>
-            </div>
-            <div
-              className={`rounded-full p-3 ${
-                Number(trend) >= 0 ? "bg-green-500/10" : "bg-red-500/10"
-              }`}
-            >
-              <TrendingUp
-                className={`h-6 w-6 ${
-                  Number(trend) >= 0 ? "text-green-500" : "text-red-500"
-                }`}
-              />
-            </div>
-          </div>
-        </Card>
       </div>
       <Card className="p-6 bg-card border-border transition-all duration-300 hover:shadow-[var(--shadow-card)]">
         <div className="mb-6">
