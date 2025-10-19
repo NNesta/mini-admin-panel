@@ -17,6 +17,7 @@ Implements **user management (CRUD)**, **Protobuf serialization**, and **RSA + S
 ```bash
 cd backend
 npm install
+npm run generate:keys
 npm run dev
 ```
 
@@ -59,6 +60,5 @@ npm run dev
 ## 🧠 Notes & Assumptions
 
 - Backend and frontend run separately (`4000`, `3000`).
-- I added the keys folder and .env file for testing purposes only. It should be in .gitignore in real life project
-- Protobuf schema ensures consistent data exchange.
+- To generate keys run `npm run generate:keys` in the backend directory and it will create another folder called `keys` in the frontend directory.
 - Swagger is used for backend API documentation.
